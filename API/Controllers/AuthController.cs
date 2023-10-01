@@ -143,8 +143,9 @@ namespace API.Controllers
             if (user is not null)
             {
                 var result = await _userManager.ConfirmEmailAsync(user, token);
+                return Ok();
             }
-            return Ok();
+            return BadRequest();
         }
     }
 }
