@@ -1,18 +1,114 @@
-﻿using Application.Models.DTOs;
+﻿using Application.Models.DTOs.Worker;
+using Application.Repositories;
 using Application.Services;
+using Domain.Entities;
+using Microsoft.AspNetCore.Identity;
 
 namespace Infrastructure.Services
 {
     public class WorkerService : IWorkerService
     {
-        public Task<bool> AcceptWorkAsync(string id)
+        private readonly UserManager<User> _userManager;
+        private readonly IWorkRequestRepository _workRequestRepository;
+
+        public WorkerService(UserManager<User> userManager, IWorkRequestRepository workRequestRepository)
         {
-            throw new NotImplementedException();
+            _userManager = userManager;
+            _workRequestRepository = workRequestRepository;
         }
 
-        public Task<ProfileDTO> GetWorkerProfile(string email)
+        public async Task<bool> AcceptWorkAsync(AcceptWorkRequest request)
         {
-            throw new NotImplementedException();
+            var worker = await _userManager.FindByEmailAsync(request.WorkerEmail);
+            if (worker is not null)
+            {
+                var workRequest = await _workRequestRepository.GetAsync(request.TaskId);
+                if (workRequest is null || workRequest.WorkerEmail != worker.Email)
+                    return false;
+
+                workRequest.IsAccepted = true;
+                _workRequestRepository.Update(workRequest);
+                await _workRequestRepository.SaveChangesAsync();
+                return true;
+            }
+            return false;
+        }
+
+        public async Task<ProfileDTO?> GetWorkerProfile(string email)
+        {
+            try
+            {
+
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+            var worker = await _userManager.FindByEmailAsync(email);
+            if (worker is not null)
+            {
+                var requests = _workRequestRepository.GetWhere(r => r.WorkerEmail == worker.Email).ToList();
+                var totalRequests = requests.Count;
+                var inactiveRequests = requests.Where(r => !r.IsAccepted.HasValue).Count();
+                var activeRequests = requests.Where(r => r.IsAccepted.HasValue && r.IsAccepted.Value).Count();
+                var completedRequests = requests.Where(r => r.IsCompleted).Count();
+                var rating = _workRequestRepository.GetWhere(r => r.WorkerEmail == worker.Email && r.Rating.HasValue).Select(r => r.Rating.Value).Sum() / _workRequestRepository.GetWhere(r => r.WorkerEmail == worker.Email && r.Rating.HasValue).Count();
+
+
+                var dto = new ProfileDTO
+                {
+                    FirstName = worker.FirstName,
+                    LastName = worker.LastName,
+                    Email = worker.Email,
+                    ActiveRequestsCount = activeRequests,
+                    CompletedRequestsCount = completedRequests,
+                    InactiveRequestsCount = inactiveRequests,
+                    TotalRequestsCount = totalRequests,
+                    Rating = rating
+                };
+                return dto;
+            }
+            return null;
+        }
+
+        public IEnumerable<RequestDTO> SeeActiveRequests(string email)
+            => _workRequestRepository
+            .GetWhere(r => r.WorkerEmail == email && r.IsAccepted.HasValue && r.IsAccepted.Value)
+            .Select(r => new RequestDTO { Id = r.Id.ToString(), Message = r.Message, UserMail = r.ClientEmail });
+
+        public IEnumerable<RequestDTO> SeeCompletedTasks(string email)
+            => _workRequestRepository
+                .GetWhere(r => r.WorkerEmail == email || r.IsCompleted)
+                .Select(r => new RequestDTO { Id = r.Id.ToString(), Message = r.Message, UserMail = r.ClientEmail });
+
+        public IEnumerable<RequestDTO> SeeInactiveRequests(string email)
+            => _workRequestRepository
+                .GetWhere(r => r.WorkerEmail == email && !r.IsAccepted.HasValue)
+                .Select(r => new RequestDTO { Id = r.Id.ToString(), Message = r.Message, UserMail = r.ClientEmail });
+
+        public async Task<bool> SetWorkDoneAsync(SetWorkDoneRequest request)
+        {
+            try
+            {
+
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            var worker = await _userManager.FindByEmailAsync(request.WorkerEmail);
+            if (worker is not null)
+            {
+                var workRequest = await _workRequestRepository.GetAsync(request.TaskId);
+                if (workRequest is null || workRequest.WorkerEmail != worker.Email || !workRequest.IsAccepted.Value)
+                    return false;
+
+                workRequest.IsCompleted = true;
+                _workRequestRepository.Update(workRequest);
+                await _workRequestRepository.SaveChangesAsync();
+                return true;
+            }
+            return false;
         }
     }
 }

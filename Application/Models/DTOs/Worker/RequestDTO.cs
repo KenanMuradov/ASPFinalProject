@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Models.DTOs
+namespace Application.Models.DTOs.Worker
 {
-    public class ProfileDTO
+    internal class RequestDTO
     {
     }
 }

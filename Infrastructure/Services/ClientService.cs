@@ -36,6 +36,22 @@ namespace Infrastructure.Services
             return dtos;
         }
 
+        public IEnumerable<UserRequestDTO> GetUsersRequests(string userEmail)
+        {
+            return _workRequestRepository
+                .GetWhere(wr => wr.ClientEmail == userEmail)
+                .Select(wr =>
+                {
+                    return new UserRequestDTO
+                    {
+                        Id = wr.Id.ToString(),
+                        IsAccepted = wr.IsAccepted.HasValue ? wr.IsAccepted.Value : false,
+                        IsCompleted = wr.IsCompleted,
+                        WorkerEmail = wr.WorkerEmail
+                    };
+                });
+        }
+
         public IEnumerable<WorkerDTO> GetWorkersByCategory(string categoryId)
         {
             return _workerCategoryRepository.GetWhere(cw => cw.CategoryId == Guid.Parse(categoryId)).ToList().Select(w => new WorkerDTO { Email = w.Worker.Email, Rating = CalculateRating(w.Worker) });
@@ -46,6 +62,26 @@ namespace Infrastructure.Services
             var workers = (await _userManager.GetUsersInRoleAsync("Worker")).ToList();
             return workers.OrderBy(w => CalculateRating(w)).Select(w => new WorkerDTO { Email = w.Email, Rating = CalculateRating(w) });
 
+        }
+
+        public async Task<bool> RateWorkDoneAsync(RateWorkDTO model)
+        {
+            try
+            {
+                var wr = await _workRequestRepository.GetAsync(model.Id);
+                if(wr is null || wr.IsCompleted is false)
+                    return false;
+
+                wr.Rating = model.Rate;
+                _workRequestRepository.Update(wr);
+                await _workRequestRepository.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            
         }
 
         public IEnumerable<CategoryShowDTO> SeeAllCategories()

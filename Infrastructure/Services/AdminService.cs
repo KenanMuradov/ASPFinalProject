@@ -46,7 +46,7 @@ namespace Infrastructure.Services
         {
             try
             {
-                var user = await _userManager.FindByEmailAsync("admin@admin.com");
+                var user = await _userManager.FindByEmailAsync(model.Email);
                 if (user is null)
                 {
                     user = new User

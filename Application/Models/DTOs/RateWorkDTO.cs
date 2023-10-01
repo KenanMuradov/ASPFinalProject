@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace Application.Models.DTOs
 {
-    internal class RateWorkDTO
+    public class RateWorkDTO
     {
+        public string Id { get; set; }
+        public int Rate { get; set; }
     }
 }

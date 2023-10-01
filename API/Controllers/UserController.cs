@@ -33,6 +33,22 @@ namespace API.Controllers
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "User")]
         public ActionResult<IEnumerable<WorkerDTO>> GetWorkersByCategory(string categoryId) => Ok(_service.GetWorkersByCategory(categoryId));
 
+        [HttpGet("seeMyRequests")]
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "User")]
+        public ActionResult<UserRequestDTO> GetAllRequests(string userEmail) => Ok(_service.GetUsersRequests(userEmail));
+
+        [HttpPost("rateWork")]
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "User")]
+        public async Task<ActionResult<bool>> RateWork([FromBody] RateWorkDTO model)
+        {
+            var result = await _service.RateWorkDoneAsync(model);
+
+            if(!result)
+                return BadRequest(result);
+
+            return result;
+        }
+
         [HttpPost("sendWorkRequest")]
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "User")]
         public async Task<ActionResult<bool>> SendWorkRequest([FromBody] WorkRequestDTO request)

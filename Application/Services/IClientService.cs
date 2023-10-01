@@ -16,6 +16,6 @@ namespace Application.Services
         Task<bool> SendWorkRequest(WorkRequestDTO request);
         IEnumerable<CategoryShowDTO> SeeAllCategories();
         IEnumerable<UserRequestDTO> GetUsersRequests(string userEmail);
-        Task<bool> RateWorkDone(RateWorkDTO model);
+        Task<bool> RateWorkDoneAsync(RateWorkDTO model);
     }
 }
