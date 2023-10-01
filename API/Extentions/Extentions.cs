@@ -110,12 +110,16 @@ namespace API.Extentions
             return services;
         }
 
-        public static IServiceCollection AddDomainServices(this IServiceCollection services)
+        public static IServiceCollection AddDomainServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddScoped<IWorkerCategoryService, WorkerCategoryService>();
             services.AddScoped<IAdminService, AdminService>();
             services.AddScoped<IWorkerService, WorkerService>();
             services.AddScoped<IClientService, ClientService>();
+            services.AddScoped<IMailService, MailService>();
+            var smtpConfig = new SMTPConfig();
+            configuration.GetSection("SMTP").Bind(smtpConfig);
+            services.AddSingleton(smtpConfig);
             return services;
         }
     }

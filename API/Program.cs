@@ -17,7 +17,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwagger();
 builder.Services.AddContext(builder.Configuration);
 builder.Services.AddRepositories();
-builder.Services.AddDomainServices();
+builder.Services.AddDomainServices(builder.Configuration);
 builder.Services.AddAuthenticationAndAuthorization(builder.Configuration);
 
 

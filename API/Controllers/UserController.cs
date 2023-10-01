@@ -3,7 +3,6 @@ using Application.Models.DTOs.Category;
 using Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Data;
 
 namespace API.Controllers
 {
@@ -36,6 +35,14 @@ namespace API.Controllers
 
         [HttpPost("sendWorkRequest")]
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "User")]
-        public async Task<ActionResult<bool>> SendWorkRequest([FromBody] WorkRequestDTO request) => await _service.SendWorkRequest(request);
+        public async Task<ActionResult<bool>> SendWorkRequest([FromBody] WorkRequestDTO request)
+        {
+            var result = await _service.SendWorkRequest(request);
+
+            if(!result)
+                return BadRequest(request);
+
+            return result;
+        }
     }
 }

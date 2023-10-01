@@ -41,14 +41,16 @@ namespace Infrastructure.Services
             return _workerCategoryRepository.GetWhere(cw => cw.CategoryId == Guid.Parse(categoryId)).ToList().Select(w => new WorkerDTO { Email = w.Worker.Email, Rating = CalculateRating(w.Worker) });
         }
 
-        public Task<IEnumerable<WorkerDTO>> GetWorkersByRatingAsync(bool desc = true)
+        public async Task<IEnumerable<WorkerDTO>> GetWorkersByRatingAsync(bool desc = true)
         {
-            throw new NotImplementedException();
+            var workers = (await _userManager.GetUsersInRoleAsync("Worker")).ToList();
+            return workers.OrderBy(w => CalculateRating(w)).Select(w => new WorkerDTO { Email = w.Email, Rating = CalculateRating(w) });
+
         }
 
         public IEnumerable<CategoryShowDTO> SeeAllCategories()
         {
-           return _categoryRepository.GetAll().Select(c => new CategoryShowDTO { Id = c.Id.ToString(), Name = c.Name });
+            return _categoryRepository.GetAll().Select(c => new CategoryShowDTO { Id = c.Id.ToString(), Name = c.Name });
         }
 
         public async Task<bool> SendWorkRequest(WorkRequestDTO request)
@@ -74,7 +76,7 @@ namespace Infrastructure.Services
 
                 return true;
             }
-            catch 
+            catch
             {
                 return false;
             }
