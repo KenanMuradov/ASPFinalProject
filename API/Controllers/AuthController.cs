@@ -69,10 +69,10 @@ namespace API.Controllers
             if (!result.Succeeded)
                 return BadRequest(result.Errors);
 
-            //var confirmToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            //var url = Url.Action(nameof(ConfirmEmail), "Auth", new { email = user.Email, token = confirmToken }, Request.Scheme);
-            //if (url is not null)
-            //    _mailService.SendConfirmationMessage(user.Email, url);
+            var confirmToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            var url = Url.Action(nameof(ConfirmEmail), "Auth", new { email = user.Email, token = confirmToken }, Request.Scheme);
+            if (url is not null)
+                _mailService.SendConfirmationMessage(user.Email, url);
 
             if (!await _roleManager.RoleExistsAsync("Worker"))
                 await _roleManager.CreateAsync(new IdentityRole("Worker"));
@@ -111,13 +111,17 @@ namespace API.Controllers
             {
                 return BadRequest();
             }
+            if (await _userManager.IsEmailConfirmedAsync(user))
+            {
+                var canSignIn = await _signInManager.CheckPasswordSignInAsync(user, request.Password, false);
 
-            var canSignIn = await _signInManager.CheckPasswordSignInAsync(user, request.Password, false);
+                if (!canSignIn.Succeeded)
+                    return BadRequest();
 
-            if (!canSignIn.Succeeded)
-                return BadRequest();
+                return await GenerateToken(user);
+            }
 
-            return await GenerateToken(user);
+            return BadRequest();
         }
 
         [HttpPost("refresh")]
@@ -131,13 +135,16 @@ namespace API.Controllers
             return await GenerateToken(user);
         }
 
-        //public async void ConfirmEmail(string email, string token)
-        //{
-        //    var user = await _userManager.FindByEmailAsync(email);
-        //    if (user is not null)
-        //    {
-        //        var result = await _userManager.ConfirmEmailAsync(user, token);
-        //    }
-        //}
+        [HttpGet]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        public async Task<ActionResult> ConfirmEmail(string email, string token)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user is not null)
+            {
+                var result = await _userManager.ConfirmEmailAsync(user, token);
+            }
+            return Ok();
+        }
     }
 }

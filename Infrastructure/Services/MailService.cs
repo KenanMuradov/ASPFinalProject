@@ -70,6 +70,11 @@ namespace Infrastructure.Services
 </body>
 </html>"
             };
+
+            message.From = new MailAddress(_config.Username);
+            message.To.Add(new MailAddress(email));
+
+            smtp.Send(message);
         }
 
         public void SendTaskAcceptanceMessage(string clientEmail, string workerEmail)

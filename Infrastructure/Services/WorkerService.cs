@@ -21,61 +21,67 @@ namespace Infrastructure.Services
 
         public async Task<bool> AcceptWorkAsync(AcceptWorkRequest request)
         {
-            var worker = await _userManager.FindByEmailAsync(request.WorkerEmail);
-            if (worker is not null)
+            try
             {
-                var workRequest = await _workRequestRepository.GetAsync(request.TaskId);
-                if (workRequest is null || workRequest.WorkerEmail != worker.Email)
-                    return false;
+                var worker = await _userManager.FindByEmailAsync(request.WorkerEmail);
+                if (worker is not null)
+                {
+                    var workRequest = await _workRequestRepository.GetAsync(request.TaskId);
+                    if (workRequest is null || workRequest.WorkerEmail != worker.Email)
+                        return false;
 
-                workRequest.IsAccepted = true;
-                _workRequestRepository.Update(workRequest);
-                await _workRequestRepository.SaveChangesAsync();
-                _mailService.SendTaskAcceptanceMessage(workRequest.ClientEmail, workRequest.WorkerEmail);
-                return true;
+                    workRequest.IsAccepted = true;
+                    _workRequestRepository.Update(workRequest);
+                    await _workRequestRepository.SaveChangesAsync();
+                    _mailService.SendTaskAcceptanceMessage(workRequest.ClientEmail, workRequest.WorkerEmail);
+                    return true;
+                }
+                return false;
             }
-            return false;
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         public async Task<ProfileDTO?> GetWorkerProfile(string email)
         {
             try
             {
+                var worker = await _userManager.FindByEmailAsync(email);
+                if (worker is not null)
+                {
+                    var requests = _workRequestRepository.GetWhere(r => r.WorkerEmail == worker.Email).ToList();
+                    var totalRequests = requests.Count;
+                    var inactiveRequests = requests.Where(r => !r.IsAccepted.HasValue).Count();
+                    var activeRequests = requests.Where(r => r.IsAccepted.HasValue && r.IsAccepted.Value).Count();
+                    var completedRequests = requests.Where(r => r.IsCompleted).Count();
+                    var rating = _workRequestRepository.GetWhere(r => r.WorkerEmail == worker.Email && r.Rating.HasValue).Select(r => r.Rating.Value).Sum();
+                    if (_workRequestRepository.GetWhere(r => r.WorkerEmail == worker.Email && r.Rating.HasValue).Any())
+                        rating /= _workRequestRepository.GetWhere(r => r.WorkerEmail == worker.Email && r.Rating.HasValue).Count();
+                    else
+                        rating = 0;
 
+
+                    var dto = new ProfileDTO
+                    {
+                        FirstName = worker.FirstName,
+                        LastName = worker.LastName,
+                        Email = worker.Email,
+                        ActiveRequestsCount = activeRequests,
+                        CompletedRequestsCount = completedRequests,
+                        InactiveRequestsCount = inactiveRequests,
+                        TotalRequestsCount = totalRequests,
+                        Rating = rating
+                    };
+                    return dto;
+                }
+                return null;
             }
             catch (Exception)
             {
                 return null;
             }
-            var worker = await _userManager.FindByEmailAsync(email);
-            if (worker is not null)
-            {
-                var requests = _workRequestRepository.GetWhere(r => r.WorkerEmail == worker.Email).ToList();
-                var totalRequests = requests.Count;
-                var inactiveRequests = requests.Where(r => !r.IsAccepted.HasValue).Count();
-                var activeRequests = requests.Where(r => r.IsAccepted.HasValue && r.IsAccepted.Value).Count();
-                var completedRequests = requests.Where(r => r.IsCompleted).Count();
-                var rating = _workRequestRepository.GetWhere(r => r.WorkerEmail == worker.Email && r.Rating.HasValue).Select(r => r.Rating.Value).Sum();
-                if (_workRequestRepository.GetWhere(r => r.WorkerEmail == worker.Email && r.Rating.HasValue).Count() != 0)
-                    rating = rating / _workRequestRepository.GetWhere(r => r.WorkerEmail == worker.Email && r.Rating.HasValue).Count();
-                else
-                    rating = 0;
-
-
-                var dto = new ProfileDTO
-                {
-                    FirstName = worker.FirstName,
-                    LastName = worker.LastName,
-                    Email = worker.Email,
-                    ActiveRequestsCount = activeRequests,
-                    CompletedRequestsCount = completedRequests,
-                    InactiveRequestsCount = inactiveRequests,
-                    TotalRequestsCount = totalRequests,
-                    Rating = rating
-                };
-                return dto;
-            }
-            return null;
         }
 
         public async Task<bool> RejectWorkAsync(RejectWorkRequest request)

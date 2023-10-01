@@ -69,7 +69,8 @@ namespace API.Extentions
                 op.Lockout.AllowedForNewUsers = true;
                 op.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(2);
                 op.Lockout.MaxFailedAccessAttempts = 5;
-            }).AddEntityFrameworkStores<AppDbContext>();
+            }).AddEntityFrameworkStores<AppDbContext>()
+            .AddDefaultTokenProviders();
 
             services.AddScoped<IJWTService, JWTService>();
 
