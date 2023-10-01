@@ -59,7 +59,17 @@ namespace API.Extentions
 
         public static IServiceCollection AddAuthenticationAndAuthorization(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddIdentity<User, IdentityRole>(setup => { }).AddEntityFrameworkStores<AppDbContext>();
+            services.AddIdentity<User, IdentityRole>(op =>
+            {
+                op.Password.RequiredLength = 3;
+                op.Password.RequireNonAlphanumeric = false;
+                op.Password.RequireUppercase = false;
+                op.Password.RequireLowercase = false;
+                op.Password.RequireDigit = false;
+                op.Lockout.AllowedForNewUsers = true;
+                op.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(2);
+                op.Lockout.MaxFailedAccessAttempts = 5;
+            }).AddEntityFrameworkStores<AppDbContext>();
 
             services.AddScoped<IJWTService, JWTService>();
 

@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace Application.Models.DTOs.Worker
 {
-    public class RequestDTO
+    public class RejectWorkRequest
     {
-        public string Id { get; set; }
-        public string UserMail { get; set; }
-        public string Message { get; set; }
+        public string WorkerEmail { get; set; }
+        public string TaskId { get; set; }
     }
 }

@@ -69,10 +69,10 @@ namespace API.Controllers
             if (!result.Succeeded)
                 return BadRequest(result.Errors);
 
-            var confirmToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            var url = Url.Action(nameof(ConfirmEmail), "Auth", new { email = user.Email, token = confirmToken }, Request.Scheme);
-            if (url is not null)
-                _mailService.SendConfirmationMessage(user.Email, url);
+            //var confirmToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            //var url = Url.Action(nameof(ConfirmEmail), "Auth", new { email = user.Email, token = confirmToken }, Request.Scheme);
+            //if (url is not null)
+            //    _mailService.SendConfirmationMessage(user.Email, url);
 
             if (!await _roleManager.RoleExistsAsync("Worker"))
                 await _roleManager.CreateAsync(new IdentityRole("Worker"));
@@ -131,13 +131,13 @@ namespace API.Controllers
             return await GenerateToken(user);
         }
 
-        public async void ConfirmEmail(string email, string token)
-        {
-            var user = await _userManager.FindByEmailAsync(email);
-            if (user is not null)
-            {
-                var result = await _userManager.ConfirmEmailAsync(user, token);
-            }
-        }
+        //public async void ConfirmEmail(string email, string token)
+        //{
+        //    var user = await _userManager.FindByEmailAsync(email);
+        //    if (user is not null)
+        //    {
+        //        var result = await _userManager.ConfirmEmailAsync(user, token);
+        //    }
+        //}
     }
 }

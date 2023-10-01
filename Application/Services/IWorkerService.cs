@@ -9,8 +9,9 @@ namespace Application.Services
 {
     public interface IWorkerService
     {
-        Task<ProfileDTO> GetWorkerProfile(string email);
+        Task<ProfileDTO?> GetWorkerProfile(string email);
         Task<bool> AcceptWorkAsync(AcceptWorkRequest request);
+        Task<bool> RejectWorkAsync(RejectWorkRequest request);
         Task<bool> SetWorkDoneAsync(SetWorkDoneRequest requestId);
         IEnumerable<RequestDTO> SeeInactiveRequests(string email);
         IEnumerable<RequestDTO> SeeActiveRequests(string email);
