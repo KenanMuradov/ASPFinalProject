@@ -3,10 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
-    [Authorize(Roles = "Worker")]
     [Route("api/[controller]")]
     [ApiController]
-    public class WorkerController : Controller
+    public class WorkerController : ControllerBase
     {
+        
     }
 }

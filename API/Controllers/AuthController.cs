@@ -56,7 +56,9 @@ namespace API.Controllers
 
             var user = new User
             {
-                UserName = request.Username,
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                UserName = request.Email,
                 Email = request.Email,
                 RefreshToken = Guid.NewGuid().ToString("N").ToLower(),
             };
