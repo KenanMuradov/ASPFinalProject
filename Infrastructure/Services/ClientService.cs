@@ -38,7 +38,7 @@ namespace Infrastructure.Services
 
         public IEnumerable<WorkerDTO> GetWorkersByCategory(string categoryId)
         {
-            return _workerCategoryRepository.GetWhere(cw => cw.CategoryId == Guid.Parse(categoryId)).Select(w => new WorkerDTO { Email = w.Worker.Email, Rating = CalculateRating(w.Worker) });
+            return _workerCategoryRepository.GetWhere(cw => cw.CategoryId == Guid.Parse(categoryId)).ToList().Select(w => new WorkerDTO { Email = w.Worker.Email, Rating = CalculateRating(w.Worker) });
         }
 
         public Task<IEnumerable<WorkerDTO>> GetWorkersByRatingAsync(bool desc = true)
@@ -55,10 +55,16 @@ namespace Infrastructure.Services
         {
             try
             {
+                var client = await _userManager.FindByEmailAsync(request.UserEmail);
+                var worker = await _userManager.FindByEmailAsync(request.WorkerEmail);
+
+                if (client is null || worker is null)
+                    return false;
+
                 var workRequest = new WorkRequest
                 {
-                    ClientEmail = request.UserEmail,
-                    WorkerEmail = request.WorkerEmail,
+                    ClientEmail = client.Email,
+                    WorkerEmail = worker.Email,
                     Message = request.Message,
                     IsCompleted = false
                 };
@@ -78,7 +84,7 @@ namespace Infrastructure.Services
         private double CalculateRating(User worker)
         {
             var totalRatings = _workRequestRepository.GetWhere(r => r.WorkerEmail == worker.Email && r.Rating.HasValue).Select(r => r.Rating.Value).Sum();
-            if (totalRatings / _workRequestRepository.GetWhere(r => r.WorkerEmail == worker.Email && r.Rating.HasValue).Count() != 0)
+            if (_workRequestRepository.GetWhere(r => r.WorkerEmail == worker.Email && r.Rating.HasValue).Count() != 0)
             {
                 var avarageRating = totalRatings / _workRequestRepository.GetWhere(r => r.WorkerEmail == worker.Email && r.Rating.HasValue).Count();
                 return avarageRating;

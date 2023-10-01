@@ -49,6 +49,8 @@ if (user is null)
 {
     user = new User
     {
+        FirstName = "admin",
+        LastName = "admin",
         UserName = "admin@admin.com",
         Email = "admin@admin.com",
         EmailConfirmed = true

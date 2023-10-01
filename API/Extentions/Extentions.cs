@@ -115,6 +115,7 @@ namespace API.Extentions
             services.AddScoped<IWorkerCategoryService, WorkerCategoryService>();
             services.AddScoped<IAdminService, AdminService>();
             services.AddScoped<IWorkerService, WorkerService>();
+            services.AddScoped<IClientService, ClientService>();
             return services;
         }
     }

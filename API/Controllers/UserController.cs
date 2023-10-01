@@ -3,6 +3,7 @@ using Application.Models.DTOs.Category;
 using Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
 
 namespace API.Controllers
 {
@@ -32,5 +33,9 @@ namespace API.Controllers
         [HttpGet("getWorkersByCategory")]
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "User")]
         public ActionResult<IEnumerable<WorkerDTO>> GetWorkersByCategory(string categoryId) => Ok(_service.GetWorkersByCategory(categoryId));
+
+        [HttpPost("sendWorkRequest")]
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "User")]
+        public async Task<ActionResult<bool>> SendWorkRequest([FromBody] WorkRequestDTO request) => await _service.SendWorkRequest(request);
     }
 }

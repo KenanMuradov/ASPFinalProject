@@ -32,6 +32,7 @@ namespace Infrastructure.Services
             {
                 var category = new Category { Name = model.Name, Description = model.Description };
                 await _categoryRepository.AddAsync(category);
+                await _categoryRepository.SaveChangesAsync();
 
                 return true;
             }
