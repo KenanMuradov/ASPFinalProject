@@ -36,27 +36,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-var container = app.Services.CreateScope();
-var userManager = container.ServiceProvider.GetRequiredService<UserManager<User>>();
-var roleManager = container.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-if (!await roleManager.RoleExistsAsync("Admin"))
-{
-    var result = await roleManager.CreateAsync(new IdentityRole("Admin"));
-}
-
-var user = await userManager.FindByEmailAsync("admin@admin.com");
-if (user is null)
-{
-    user = new User
-    {
-        FirstName = "admin",
-        LastName = "admin",
-        UserName = "admin@admin.com",
-        Email = "admin@admin.com",
-        EmailConfirmed = true
-    };
-    var result = await userManager.CreateAsync(user, "Admin_2924");
-    result = await userManager.AddToRoleAsync(user, "Admin");
-}
+app.RegisterFirstAdmin();
 
 app.Run();

@@ -50,7 +50,7 @@ namespace API.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult<AuthTokenDTO>> Register(RegisterRequest request)
+        public async Task<ActionResult> Register(RegisterRequest request)
         {
             var existingUser = await _userManager.FindByEmailAsync(request.Email);
             if (existingUser is not null)
@@ -100,7 +100,7 @@ namespace API.Controllers
             else
                 await _userManager.AddToRoleAsync(user, "User");
 
-            return await GenerateToken(user);
+            return Ok();
         }
 
         [HttpPost("login")]
@@ -121,7 +121,7 @@ namespace API.Controllers
                 return await GenerateToken(user);
             }
 
-            return BadRequest();
+            return Unauthorized();
         }
 
         [HttpPost("refresh")]

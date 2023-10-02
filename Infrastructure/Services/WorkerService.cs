@@ -54,7 +54,7 @@ namespace Infrastructure.Services
                     var requests = _workRequestRepository.GetWhere(r => r.WorkerEmail == worker.Email).ToList();
                     var totalRequests = requests.Count;
                     var inactiveRequests = requests.Where(r => !r.IsAccepted.HasValue).Count();
-                    var activeRequests = requests.Where(r => r.IsAccepted.HasValue && r.IsAccepted.Value).Count();
+                    var activeRequests = requests.Where(r => r.IsAccepted.HasValue && r.IsAccepted.Value && !r.IsCompleted).Count();
                     var completedRequests = requests.Where(r => r.IsCompleted).Count();
                     var rating = _workRequestRepository.GetWhere(r => r.WorkerEmail == worker.Email && r.Rating.HasValue).Select(r => r.Rating.Value).Sum();
                     if (_workRequestRepository.GetWhere(r => r.WorkerEmail == worker.Email && r.Rating.HasValue).Any())
