@@ -51,6 +51,8 @@ namespace Infrastructure.Services
                 {
                     user = new User
                     {
+                        FirstName = "admin",
+                        LastName = "admin",
                         UserName = model.Email,
                         Email = model.Email,
                         EmailConfirmed = true
