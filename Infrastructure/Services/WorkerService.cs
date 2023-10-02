@@ -103,7 +103,7 @@ namespace Infrastructure.Services
                 await _workerCategoryRepository.AddAsync(workerCategory);
                 await _workerCategoryRepository.SaveChangesAsync();
 
-                await Console.Out.WriteLineAsync(workerCategory.Category.Name);
+                await Console.Out.WriteLineAsync(workerCategory.User.FirstName);
                 return true;
             }
             return false;

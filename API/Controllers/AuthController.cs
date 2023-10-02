@@ -82,19 +82,20 @@ namespace API.Controllers
 
             if (request.IsWorker)
             {
-                if (request.CategoryId is null)
+                if (request.CategoryIds is null)
                     return BadRequest();
 
-                var workerCategory = new WorkerCategoryDTO() 
-                { 
-                    CategoryId = request.CategoryId,
-                    WorkerId = user.Id
-                };
-
-                var isAdded = await _workerCategoryService.AddAsync(workerCategory);
-                if (!isAdded)
-                    return BadRequest(request.CategoryId);
-
+                foreach (var categoryId in request.CategoryIds)
+                {
+                    var workerCategory = new WorkerCategoryDTO()
+                    {
+                        CategoryId = categoryId,
+                        WorkerId = user.Id
+                    };
+                    var isAdded = await _workerCategoryService.AddAsync(workerCategory);
+                    if (!isAdded)
+                        return BadRequest(request.CategoryIds);
+                }
                 await _userManager.AddToRoleAsync(user, "Worker");
             }
             else
@@ -113,14 +114,13 @@ namespace API.Controllers
             }
             if (await _userManager.IsEmailConfirmedAsync(user))
             {
-                var canSignIn = await _signInManager.CheckPasswordSignInAsync(user, request.Password, false);
+                var canSignIn = await _signInManager.PasswordSignInAsync(user, request.Password, request.RememberMe, false);
 
                 if (!canSignIn.Succeeded)
                     return BadRequest();
 
                 return await GenerateToken(user);
             }
-
             return Unauthorized();
         }
 
