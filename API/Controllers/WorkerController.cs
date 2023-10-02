@@ -21,17 +21,17 @@ namespace API.Controllers
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "Worker")]
         public async Task<ActionResult<ProfileDTO>> GetProfile(string email) => Ok(await _service.GetWorkerProfile(email));
 
-        [HttpGet("seeActiveReuests")]
+        [HttpGet("seeActiveRequests")]
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "Worker")]
-        public ActionResult<IEnumerable<RequestDTO>> GetActiveReuests(string email) => Ok(_service.SeeActiveRequests(email));
+        public ActionResult<IEnumerable<RequestDTO>> GetActiveRequests(string email) => Ok(_service.SeeActiveRequests(email));
 
-        [HttpGet("seeInactiveReuests")]
+        [HttpGet("seeInactiveRequests")]
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "Worker")]
-        public ActionResult<IEnumerable<RequestDTO>> GetInactiveReuests(string email) => Ok(_service.SeeInactiveRequests(email));
+        public ActionResult<IEnumerable<RequestDTO>> GetInactiveRequests(string email) => Ok(_service.SeeInactiveRequests(email));
 
-        [HttpGet("seeCompletedReuests")]
+        [HttpGet("seeCompletedRequests")]
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "Worker")]
-        public ActionResult<IEnumerable<RequestDTO>> GetCompletedReuests(string email) => Ok(_service.SeeCompletedTasks(email));
+        public ActionResult<IEnumerable<RequestDTO>> GetCompletedRequests(string email) => Ok(_service.SeeCompletedTasks(email));
 
         [HttpPost("completeTask")]
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "Worker")]
@@ -44,5 +44,9 @@ namespace API.Controllers
         [HttpPost("rejectTask")]
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "Worker")]
         public async Task<ActionResult<bool>> RejectTask([FromBody] RejectWorkRequest request) => Ok(await _service.RejectWorkAsync(request));
+
+        [HttpPost("newCategory")]
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "Worker")]
+        public async Task<ActionResult<bool>> RegisterInNewCategory([FromBody] CategoryRegisterRequest request) => Ok(await _service.RegisterInNewCategory(request));
     }
 }

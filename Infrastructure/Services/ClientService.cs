@@ -54,7 +54,7 @@ namespace Infrastructure.Services
 
         public IEnumerable<WorkerDTO> GetWorkersByCategory(string categoryId)
         {
-            return _workerCategoryRepository.GetWhere(cw => cw.CategoryId == Guid.Parse(categoryId)).ToList().Select(w => new WorkerDTO { Email = w.Worker.Email, Rating = CalculateRating(w.Worker) });
+            return _workerCategoryRepository.GetWhere(cw => cw.CategoryId == Guid.Parse(categoryId)).ToList().Select(w => new WorkerDTO { Email = w.User.Email, Rating = CalculateRating(w.User) });
         }
 
         public async Task<IEnumerable<WorkerDTO>> GetWorkersByRatingAsync(bool desc = true)

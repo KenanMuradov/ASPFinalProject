@@ -29,7 +29,7 @@ namespace Infrastructure.Services
             var entity = new WorkerCategory()
             {
                 CategoryId = Guid.Parse(model.CategoryId),
-                WorkerId = model.WorkerId
+                UserId = model.WorkerId
             };
 
             var result = await _workerCategoryRepository.AddAsync(entity);

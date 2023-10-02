@@ -10,13 +10,17 @@ namespace Infrastructure.Services
     {
         private readonly UserManager<User> _userManager;
         private readonly IWorkRequestRepository _workRequestRepository;
+        private readonly IWorkerCategoryRepository _workerCategoryRepository;
+        private readonly ICategoryRepository _categoryRepository;
         private readonly IMailService _mailService;
 
-        public WorkerService(UserManager<User> userManager, IWorkRequestRepository workRequestRepository, IMailService mailService)
+        public WorkerService(UserManager<User> userManager, IWorkRequestRepository workRequestRepository, IMailService mailService, ICategoryRepository categoryRepository, IWorkerCategoryRepository workerCategoryRepository)
         {
             _userManager = userManager;
             _workRequestRepository = workRequestRepository;
             _mailService = mailService;
+            _categoryRepository = categoryRepository;
+            _workerCategoryRepository = workerCategoryRepository;
         }
 
         public async Task<bool> AcceptWorkAsync(AcceptWorkRequest request)
@@ -82,6 +86,27 @@ namespace Infrastructure.Services
             {
                 return null;
             }
+        }
+
+        public async Task<bool> RegisterInNewCategory(CategoryRegisterRequest request)
+        {
+            var worker = await _userManager.FindByEmailAsync(request.WorkerEmail);
+            if(worker is not null)
+            {
+                var category = await _categoryRepository.GetAsync(request.CategoryId);
+                if (category is null)
+                    return false;
+
+                var workerCategory = new WorkerCategory { CategoryId = category.Id, UserId = worker.Id };
+
+
+                await _workerCategoryRepository.AddAsync(workerCategory);
+                await _workerCategoryRepository.SaveChangesAsync();
+
+                await Console.Out.WriteLineAsync(workerCategory.Category.Name);
+                return true;
+            }
+            return false;
         }
 
         public async Task<bool> RejectWorkAsync(RejectWorkRequest request)
