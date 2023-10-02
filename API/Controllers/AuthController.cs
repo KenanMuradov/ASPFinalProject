@@ -74,12 +74,6 @@ namespace API.Controllers
             if (url is not null)
                 _mailService.SendConfirmationMessage(user.Email, url);
 
-            if (!await _roleManager.RoleExistsAsync("Worker"))
-                await _roleManager.CreateAsync(new IdentityRole("Worker"));
-            if (!await _roleManager.RoleExistsAsync("User"))
-                await _roleManager.CreateAsync(new IdentityRole("User"));
-
-
             if (request.IsWorker)
             {
                 if (request.CategoryIds is null)

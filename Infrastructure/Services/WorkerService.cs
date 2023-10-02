@@ -120,6 +120,7 @@ namespace Infrastructure.Services
                 workRequest.IsAccepted = false;
                 _workRequestRepository.Update(workRequest);
                 await _workRequestRepository.SaveChangesAsync();
+                _mailService.SendTaskRejectionMessage(workRequest.ClientEmail);
                 return true;
             }
             return false;

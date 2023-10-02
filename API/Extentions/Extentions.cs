@@ -67,6 +67,11 @@ namespace API.Extentions
                 var result = await roleManager.CreateAsync(new IdentityRole("Admin"));
             }
 
+            if (!await roleManager.RoleExistsAsync("Worker"))
+                await roleManager.CreateAsync(new IdentityRole("Worker"));
+            if (!await roleManager.RoleExistsAsync("User"))
+                await roleManager.CreateAsync(new IdentityRole("User"));
+
             var user = await userManager.FindByEmailAsync("admin@admin.com");
             if (user is null)
             {
