@@ -13,6 +13,6 @@ namespace Application.Models.DTOs
         public string Password { get; set; } 
         public string Email { get; set; }
         public bool IsWorker { get; set; }
-        public List<string>? CategoryIds { get; set; }
+        public IEnumerable<string>? CategoryIds { get; set; }
     }
 }

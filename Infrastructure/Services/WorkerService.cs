@@ -91,7 +91,7 @@ namespace Infrastructure.Services
         public async Task<bool> RegisterInNewCategory(CategoryRegisterRequest request)
         {
             var worker = await _userManager.FindByEmailAsync(request.WorkerEmail);
-            if(worker is not null)
+            if (worker is not null)
             {
                 var category = await _categoryRepository.GetAsync(request.CategoryId);
                 if (category is null)
@@ -103,7 +103,6 @@ namespace Infrastructure.Services
                 await _workerCategoryRepository.AddAsync(workerCategory);
                 await _workerCategoryRepository.SaveChangesAsync();
 
-                await Console.Out.WriteLineAsync(workerCategory.User.FirstName);
                 return true;
             }
             return false;

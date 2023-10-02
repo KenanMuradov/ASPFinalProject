@@ -85,7 +85,7 @@ namespace API.Controllers
                 if (request.CategoryIds is null)
                     return BadRequest();
 
-                foreach (var categoryId in request.CategoryIds)
+                foreach (var categoryId in request.CategoryIds.Distinct())
                 {
                     var workerCategory = new WorkerCategoryDTO()
                     {

@@ -10,5 +10,6 @@ namespace Application.Services
     {
         public void SendConfirmationMessage(string email, string url);
         public void SendTaskAcceptanceMessage(string clientEmail, string workerEmail);
+        public void SendTaskRejectionMessage(string clientEmail);
     }
 }
