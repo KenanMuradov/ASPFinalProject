@@ -42,7 +42,7 @@ namespace Infrastructure.Services
             }
         }
 
-        public async Task<bool> AddNewAdmin(LoginRequest model)
+        public async Task<bool> AddNewAdmin(AddAdminDTO model)
         {
             try
             {

@@ -108,7 +108,7 @@ namespace API.Controllers
             }
             if (await _userManager.IsEmailConfirmedAsync(user))
             {
-                var canSignIn = await _signInManager.PasswordSignInAsync(user, request.Password, request.RememberMe, false);
+                var canSignIn = await _signInManager.CheckPasswordSignInAsync(user, request.Password, false);
 
                 if (!canSignIn.Succeeded)
                     return BadRequest();

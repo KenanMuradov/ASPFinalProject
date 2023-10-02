@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Application.Models.DTOs
 {
-    public class LoginRequest
+    public class AddAdminDTO
     {
         public string Email { get; set; }
         public string Password { get; set; }

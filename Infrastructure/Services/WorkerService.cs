@@ -133,7 +133,7 @@ namespace Infrastructure.Services
 
         public IEnumerable<RequestDTO> SeeCompletedTasks(string email)
             => _workRequestRepository
-                .GetWhere(r => r.WorkerEmail == email || r.IsCompleted)
+                .GetWhere(r => r.WorkerEmail == email && r.IsCompleted)
                 .Select(r => new RequestDTO { Id = r.Id.ToString(), Message = r.Message, UserMail = r.ClientEmail });
 
         public IEnumerable<RequestDTO> SeeInactiveRequests(string email)
@@ -145,25 +145,24 @@ namespace Infrastructure.Services
         {
             try
             {
+                var worker = await _userManager.FindByEmailAsync(request.WorkerEmail);
+                if (worker is not null)
+                {
+                    var workRequest = await _workRequestRepository.GetAsync(request.TaskId);
+                    if (workRequest is null || workRequest.WorkerEmail != worker.Email || !workRequest.IsAccepted.Value)
+                        return false;
 
+                    workRequest.IsCompleted = true;
+                    _workRequestRepository.Update(workRequest);
+                    await _workRequestRepository.SaveChangesAsync();
+                    return true;
+                }
+                return false;
             }
             catch (Exception)
             {
                 return false;
             }
-            var worker = await _userManager.FindByEmailAsync(request.WorkerEmail);
-            if (worker is not null)
-            {
-                var workRequest = await _workRequestRepository.GetAsync(request.TaskId);
-                if (workRequest is null || workRequest.WorkerEmail != worker.Email || !workRequest.IsAccepted.Value)
-                    return false;
-
-                workRequest.IsCompleted = true;
-                _workRequestRepository.Update(workRequest);
-                await _workRequestRepository.SaveChangesAsync();
-                return true;
-            }
-            return false;
         }
     }
 }

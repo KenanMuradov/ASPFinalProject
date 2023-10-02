@@ -33,7 +33,7 @@ namespace API.Controllers
 
         [HttpPost("addAdmin")]
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]
-        public async Task<ActionResult<bool>> AddAdmin([FromBody] LoginRequest model) => await _service.AddNewAdmin(model);
+        public async Task<ActionResult<bool>> AddAdmin([FromBody] AddAdminDTO model) => await _service.AddNewAdmin(model);
 
         [HttpGet("getStatistics")]
         [Authorize(AuthenticationSchemes = "Bearer", Roles = "Admin")]

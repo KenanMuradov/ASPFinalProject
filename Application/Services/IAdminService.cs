@@ -13,7 +13,7 @@ namespace Application.Services
     {
         public Task<bool> AddCategoryAsync(CategoryDTO model);
         public Task<bool> UpdateCategoryAsync(CategoryUpdateDTO model);
-        public Task<bool> AddNewAdmin(LoginRequest model);
+        public Task<bool> AddNewAdmin(AddAdminDTO model);
         public IEnumerable<CategoryShowDTO> GetAllCategories();
         public Statistics GetStatistics();
     }
